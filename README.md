@@ -2,4 +2,4 @@
 🏕 An application to brush up my node concepts
 
 
-Going live soon
+Live at https://paaji-node-farm.herokuapp.com/
