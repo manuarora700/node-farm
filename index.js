@@ -1,6 +1,7 @@
 const fs = require('fs');
 const http = require('http');
 const url = require('url');
+const express = require('express');
 
 const slugify = require('slugify');
 
@@ -36,6 +37,9 @@ const replaceTemplate = require('./modules/replaceTemplate');
 
 ///////////////////////////////////
 // SERVER
+
+const app = express();
+
 var port = process.env.PORT || 8080;
 const tempOverview = fs.readFileSync(
   `${__dirname}/templates/template-overview.html`,
@@ -57,46 +61,73 @@ const dataObj = JSON.parse(data);
 const slugs = dataObj.map(el => slugify(el.productName, { lower: true }));
 console.log(slugs);
 
-const server = http.createServer((req, res) => {
+// Express setup
+app.get('/', function(req, res) {
+  // res.send(200, { 'Content-type': 'text/html' });
+  const cardsHtml = dataObj.map(el => replaceTemplate(tempCard, el)).join('');
+  const output = tempOverview.replace(/{%PRODUCT_CARDS%}/g, cardsHtml);
+  res.end(output);
+});
+
+app.get('/overview', function(req, res) {
+  // res.send(200, { 'Content-type': 'text/html' });
+  const cardsHtml = dataObj.map(el => replaceTemplate(tempCard, el)).join('');
+  const output = tempOverview.replace(/{%PRODUCT_CARDS%}/g, cardsHtml);
+  res.end(output);
+});
+
+app.get('/product', function(req, res) {
   const { query, pathname } = url.parse(req.url, true);
+  console.log(query);
+  const product = dataObj[query.id];
 
-  // Overview page
-  if (pathname === '/' || pathname === '/overview') {
-    res.writeHead(200, { 'Content-type': 'text/html' });
-
-    const cardsHtml = dataObj.map(el => replaceTemplate(tempCard, el)).join('');
-    const output = tempOverview.replace(/{%PRODUCT_CARDS%}/g, cardsHtml);
-    res.end(output);
-  }
-
-  //   Product page
-  else if (pathname === '/product') {
-    console.log(query);
-    const product = dataObj[query.id];
-
-    const output = replaceTemplate(tempProduct, product);
-
-    res.writeHead(200, { 'Content-type': 'text/html' });
-    res.end(output);
-  }
-
-  //   API
-  else if (pathname === '/api') {
-    res.writeHead(200, { 'Content-type': 'application/json' });
-    res.end(data);
-  }
-
-  //   Not found
-  else {
-    res.writeHead(404, {
-      'Content-type': 'text/html',
-      'my-own-header': 'hello-world'
-    });
-
-    res.end('<h1>404 Not found</h1>');
-  }
+  const output = replaceTemplate(tempProduct, product);
+  // res.writeHead(200, { 'Content-type': 'text/html' });
+  res.send(output);
 });
 
-server.listen(port, () => {
-  console.log('Listening to requests on port 8000');
+app.get('/api', function(req, res) {
+  // res.writeHead(200, { 'Content-type': 'application/json' });
+  res.send(data);
 });
+// const server = http.createServer((req, res) => {
+//   const { query, pathname } = url.parse(req.url, true);
+
+//   // Overview page
+//   if (pathname === '/' || pathname === '/overview') {
+//     res.writeHead(200, { 'Content-type': 'text/html' });
+
+//     const cardsHtml = dataObj.map(el => replaceTemplate(tempCard, el)).join('');
+//     const output = tempOverview.replace(/{%PRODUCT_CARDS%}/g, cardsHtml);
+//     res.end(output);
+//   }
+
+//   //   Product page
+//   else if (pathname === '/product') {
+//     console.log(query);
+//     const product = dataObj[query.id];
+
+//     const output = replaceTemplate(tempProduct, product);
+
+//     res.writeHead(200, { 'Content-type': 'text/html' });
+//     res.end(output);
+//   }
+
+//   //   API
+//   else if (pathname === '/api') {
+//     res.writeHead(200, { 'Content-type': 'application/json' });
+//     res.end(data);
+//   }
+
+//   //   Not found
+//   else {
+//     res.writeHead(404, {
+//       'Content-type': 'text/html',
+//       'my-own-header': 'hello-world'
+//     });
+
+//     res.end('<h1>404 Not found</h1>');
+//   }
+// });
+
+app.listen(port);
