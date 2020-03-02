@@ -4,7 +4,7 @@ const http = require("http");
 /////////////////////////////////////////////////////
 // Files
 
-Read a text file - synchronous (blocking)
+// Read a text file - synchronous (blocking)
 const output = fs.readFileSync("./txt/input.txt", "utf-8");
 console.log(output);
 
