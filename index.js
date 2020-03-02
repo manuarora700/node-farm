@@ -129,5 +129,6 @@ app.get('/api', function(req, res) {
 //     res.end('<h1>404 Not found</h1>');
 //   }
 // });
-
-app.listen(port);
+app.listen(3000, () => {
+  console.log('running okay! on port 3000');
+});
