@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/manuarora700/node-farm#readme",
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "slugify": "~1.4.0"
   },
   "devDependencies": {
